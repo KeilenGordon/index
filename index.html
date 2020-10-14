@@ -1,0 +1,695 @@
+<div class="wrapper">
+   
+    <h1>Hangman</h1>
+    
+    <h2>Javascript Hangman Game</h2>
+    
+    <p>Use the alphabet below to guess the word, or click hint to get a clue. </p>
+
+</div>
+
+<div class="wrapper">
+    
+    <div class="buttons">
+    
+    </div>
+
+    <p id="categoryName"></p>
+
+    <div id="hold">
+
+    </div>
+
+    <p id="mylives"></p>
+
+    <p id="clue">Clue -</p>
+
+    <canvas id="stickman">This Text will show if the Browser does not support HTML5 Canvas tag</canvas>
+
+    <div class="container">
+
+        <button id="hint">Hint</button>
+    
+        <button id="reset">Play Again</button>
+    
+    </div>
+
+</div>
+<style>
+
+    body {
+
+        background: rgb(150, 85, 150);
+
+        font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Arial, Helvetica, "Lucinda Grande", sans-serif;
+
+        color: rgb(71, 63, 63);
+
+        height: 100%;
+
+        text-align: center;
+
+        font-size: 18px;
+    }
+
+    .wrapper {
+
+        width: 100%;
+
+        margin: 0 auto;
+
+    }
+
+    .wrapper:after {
+
+        content: "";
+
+        display: table;
+
+        clear: both;
+
+    }
+
+    canvas {
+
+        color: #fff;
+
+        border: #fff dashed 2px;
+
+        padding: 15px;
+    }
+
+    h1, h2, h3 {
+
+        font-family: 'Roboto', sans-serif;
+
+        font-weight: 100;
+
+        text-transform: uppercase;
+
+        margin: 5px 0;
+
+    }
+
+    h1 {
+
+        font-size: 2.6em;
+
+    }
+
+    h2 {
+
+        font-size: 1.6em;
+
+    }
+
+    p {
+
+        font-size: 1.6em;
+
+    }
+
+    #alphabet {
+
+        margin: 15px auto;
+
+        padding: 0;
+
+        max-width: 900px;
+
+    }
+
+    #alphabet:after {
+
+        content: "";
+
+        display: table;
+
+        clear: both;
+
+    }
+
+    #alphabet li {
+
+        float: left;
+
+        margin: 0 10px 10px 0;
+
+        list-style: none;
+
+        width: 35px;
+
+        height: 30px;
+
+        padding-top: 10px;
+        
+        background: #fff;
+        
+        color: black;
+
+        font-weight:700;
+
+        cursor: pointer;
+
+        -moz-border-radius: 5px;
+
+        -webkit-border-radius: 5px;
+
+        border-radius: 5px;
+
+        -khtml-border-radius: 5px;
+
+        border: solid 1px #fff;
+
+    }
+
+    #alphabet li:hover {
+
+        background: #c1d72e;
+
+        border: solid 1px #fff;
+
+        color: #fff;
+
+    }
+
+    #my-word {
+
+        margin: 0;
+
+        display: block;
+
+        padding: 0;
+
+        display: block;
+
+    }
+
+    #my-word li {
+
+        position: relative;
+
+        list-style: none;
+
+        margin: 0;
+
+        display: inline-block;
+
+        padding: 0 10px;
+
+        font-size: 1.6em;
+
+    }
+
+    .active {
+
+        opacity: 0.4;
+
+        filter: alpha(opacity=40);
+
+        -moz-transition: all 1s ease-in;
+
+        -moz-transition: all 0.3s ease-in-out;
+
+        -webkit-transition: all 0.3s ease-in-out;
+
+        transition: all 0.3s ease-in-out;
+
+        cursor: default;
+
+    }
+
+    .active:hover {
+
+        -moz-transition: all 1s ease-in;
+
+        -moz-transition: all 0.3s ease-in-out;
+
+        -webkit-transition: all 0.3s ease-in-out;
+
+        transition: all 0.3s ease-in-out;
+
+        opacity: 0.4;
+
+        filter: alpha(opacity=40);
+
+        -moz-transition: all 1s ease-in;
+
+        -moz-transition: all 0.3s ease-in-out;
+
+        -webkit-transition: all 0.3s ease-in-out;
+
+        transition: all 0.3s ease-in-out;
+
+
+    }
+
+    #mylives {
+
+        font-size: 1.6em;
+
+        text-align: center;
+
+        display: block;
+
+    }
+
+    button {
+
+        -moz-border-radius: 5px;
+
+        -webkit-border-radius: 5px;
+
+        border-radius: 5px;
+
+        -khtml-border-radius: 5px;
+
+        background: #000;
+
+        color: #fff;
+
+        border: solid 1px #fff;
+
+        text-decoration: none;
+
+        cursor: pointer;
+
+        font-size: 1.2em;
+
+        padding: 18px 10px;
+
+        width: 180px;
+
+        margin: 10px;
+
+        outline: none;
+
+    }
+
+    button {
+
+        -webkit-transition: all 0.3s ease-in-out;
+
+        -moz-transition: all 0.3s ease-in-out;
+
+        transition: all 0.3s ease-in-out;
+
+        background:  rgb(71, 63, 63);
+
+        border: solid 1px rgb(71, 63, 63);
+
+        color: #fff;
+        
+    }
+
+    @media (max-width: 767px) {
+
+        #alphabet {
+
+            padding: 0 0 0 15px;
+
+        }
+
+    }
+
+    @media (max-width: 480px) {
+
+        #alphabet {
+
+            padding: 0 0 0 25px;
+
+        }
+    }
+
+</style>
+<script>
+
+    window.onload = function () {
+
+        var alphabet = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+
+        var categories; //topics
+
+        var chosenCategory; //selected categories
+
+        var getHint; //word hints
+
+        var word; //selected word
+
+        var guess; //guess
+
+        var guess = []; //stored guesses
+
+        var lives; //lives
+
+        var counter; //correct guesses
+
+        var space; //number of spaces in word '-'
+
+        //Elements
+
+        var showLives = document.getElementById("mylives");
+
+        var showCategory = document.getElementById("scategory");
+
+        var getHint = document.getElementById("hint");
+
+        var showClue = document.getElementById("clue");
+
+        //create alphabet ul
+
+        var buttons = function () {
+
+            myButtons = document.getElementById('buttons');
+
+            letters = document.getElementById('ul');
+
+            for (var i = 0; i < alphabet.length; i++) {
+
+                letters.id = 'alphabet';
+
+                list = document.getElementById('li');
+
+                list.id = 'letter';
+
+                list.innerHTML = alphabet[i];
+
+                check();
+
+                myButtons.appendChild(letters);
+                
+                letters.appendChild(list);            }       
+            
+            }
+
+        }
+
+        //select category
+
+        var selectCat = function () {
+
+            if (chosenCategory === categories[0]) {
+
+                categoryName.innerHTML = "The Chosen Category is Foods";
+
+            } else if (chosenCategory === categories[1]) {
+
+                categoryName.innerHTML = "The Chosen Category is Films";
+
+            } else if (chosenCategory === categories[2]) {
+
+                categoryName.innerHTML == "The Chosen Category is Cities";
+            }
+
+        }
+
+        // create guesses
+
+        result = function () {
+
+            wordHolder = document.getElementById('hold');
+
+            correct = document.createElement('ul');
+
+            for (var i = 0; i < word.length; i++) {
+
+                correct.setAttribute('id', 'my-word');
+
+                guess = document.createElement('li');
+
+                guess.setAttribute('class', 'guess');
+
+                if (word[i] === "-") {
+
+                    guess.innerHTML = "-";
+
+                    space = 1;
+
+                } else { 
+
+                    guess.innerHTML = "_";
+
+                }
+
+                guesses.push(guess);
+
+                wordHolder.appendChild(correct);
+
+                correct.appendChild(guess);
+
+            }
+
+        }
+
+        // show lives
+
+        comments = function () {
+
+            showLives.innerHTML = "You Have" + lives + " Lives";
+
+            if (lives < 1) {
+
+                showLives.innerHTML = "GAME OVER";
+
+            }
+
+            for (var i = 0; i < guesses.length; i++) {
+
+                if (counter + space === guesses.length) {
+
+                    showLives.innerHTML = " YOU WIN!";
+
+                }
+            }
+        }
+
+        // Animate Man
+
+        var animate = function () {
+
+            var drawMe = lives;
+
+            drawArray[drawMe]();
+
+        }
+
+        //Hangman
+
+        canvas = function() {
+
+            myStickman = document.getElementById("stickman");
+
+            context = myStickman.getContext('2d');
+
+            context.beginPath();
+
+            context.strokeStyle === "#fff";
+
+            context.lineWidth = 2;
+
+        };
+
+        head = function () {
+
+            myStickman = document.getElementById("stickman");
+
+            context = myStickman.getContext('2d');
+
+            context.beginPath();
+
+            context.arc(60, 25, 10, 0, Math.PI*2, true);
+
+            context.stroke();
+
+        }
+
+        draw = function ($pathFromx, $pathFromy, $pathTox, $pathToy) {
+
+            context.moveTo($pathFromx, $pathFromy);
+
+            context.lineTo($pathTox, $pathToy);
+
+            context.stroke();
+
+        }
+
+        frame1 = function () {
+
+            draw (0, 150, 150, 150);
+
+        };
+
+        frame2 = function () {
+
+            draw (10, 0, 10, 600);
+
+        };
+
+        frame3 = function () {
+
+            draw (0, 5, 70, 5);
+
+        };
+
+        frame4 = function () {
+
+            draw (60, 5, 60, 15);
+
+        };
+
+        torso = function () {
+
+            draw (60, 36, 60, 70);
+
+        };
+
+        rightArm = function () {
+
+            draw (60, 46, 20, 50);
+
+        };
+
+        leftArm = function () {
+
+            draw (60, 46, 20, 50);
+
+        };
+
+        rightLeg = function () {
+
+            draw (60, 70, 100, 100);
+
+        };
+
+        leftLeg = function () {
+
+            draw (60, 70, 20, 100);
+
+        };
+
+        drawArray = [rightLeg, leftLeg, rightArm, leftArm, torso, head, frame4, frame3, frame2, frame1];
+
+        //OnClick Function
+
+        check = function () {
+
+            list.onclick = function () {
+                var guess = (this.innerHTML);
+
+            this.setAttribute("class", "active");
+
+            this.onclick = null;
+
+            for (var i = 0; i < word.length; i++);
+
+                if (word[i] === guess) {
+
+                    guesses[i].innerHTML = guess;
+
+                    counter += 1;
+
+                }
+           
+           }
+
+           var j = (word.indexOf(guess));
+
+           if (j === -1) {
+
+               lives -= 1;
+
+               comments();
+
+               animate();
+
+           } else {
+
+               comments();
+
+           }
+
+        //play
+
+        play = function () {
+
+            categories = [
+
+            ["Apple", "Banana", "Grapes", "Orange", "Pineapple", "Peach", "Cherry"],
+
+            ["Houston", "Los Angeles", "Seattle", "New York", "Miami", "New Orleans", "Chicago", "Las Vegas", "Washington D.C."],
+
+            ["Titantic", "The Grinch", "Home Alone", "Avengers", "Pirates of the Carribean", "Moana", "The Hangover", "Friday"]
+            
+            ];
+
+            chosenCategory = categories[Math.floor(Math.random() * categories.length)];
+
+            word = chosenCategory[Math.floor(Math.random() * chosenCategory.length)];
+
+            word = word.replace(/\s/g, "-");
+
+            console.log(word);
+
+            buttons();
+
+            guesses = [ ];
+
+            lives = 10;
+
+            counter = 0;
+
+            space = 0;
+
+            result();
+
+            comments();
+
+            selectCat();
+
+            canvas();
+
+        }
+
+        play();
+
+        //hints
+
+        hint.onclick = function (){
+
+            hints = [
+
+            ["Monkey's love to eat this fruit", "This fruit turns into an adult bottled drink", "Great Vitamin C", "Granny Smith", "Great for cobblers", "Topping for a milkshake"]
+
+            ["Astro's Hometown", "Hollywood", "One of the biggest cities for tech", " Has one of the most infamous parks", "The place Pitbull calls the 305", "Home of one of the biggest party festivals on a street", "A broadway play shares it's name", "Casinos everywhere", "Library of Congress lives here"],
+
+            ["A story about a boat and love", "He tried to steal Christmas", "His family left him and went to Paris", "A group of superheros", "The Black Pearl", "The Rock played a Demi-God", "They eventually found their friend on the roof of their hotel", "It's Friday, you aint got no job or nothing to do!"]
+            
+            ];
+
+            var categoryIndex = categories.indexOf(chosenCategory);
+
+            var hintIndex = chosenCategory.indexOf(word);
+
+            showClue.innerHTML = "Clue: - " + hints [categoryIndex][hintIndex];
+
+        };
+
+        //reset
+
+        document.getElementById('reset'.onclick = function () {
+
+            correct.parentNode.removeChild(correct);
+
+            letters.parentNode.removeChild(letters);
+
+            showClue.innerHTML = "";
+
+            context.clearRect(0, 0, 400, 400);
+
+            play();
+        
+            }
+
+        }
+        
+</script>
